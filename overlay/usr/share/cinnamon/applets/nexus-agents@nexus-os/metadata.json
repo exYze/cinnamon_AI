@@ -1,0 +1,10 @@
+{
+  "uuid": "nexus-agents@nexus-os",
+  "name": "NexusOS Agent Monitor",
+  "description": "Monitor and control autonomous AI agents from the panel",
+  "version": "0.1.0",
+  "cinnamon-version": ["6.0"],
+  "max-instances": 1,
+  "icon": "nexus-agent-symbolic",
+  "category": "System"
+}

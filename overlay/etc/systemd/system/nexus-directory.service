@@ -1,0 +1,28 @@
+[Unit]
+Description=NexusOS Directory — LDAP-compatible Identity Provider
+Documentation=https://nexus-os.dev/docs
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=nexus
+Group=nexus
+ExecStart=/opt/nexus/venv/bin/nexus-directory --host 127.0.0.1 --port 3389
+Restart=on-failure
+RestartSec=5
+RuntimeDirectory=nexus
+StateDirectory=nexus
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=nexus-directory
+
+# Security hardening
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/nexus /var/log/nexus
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

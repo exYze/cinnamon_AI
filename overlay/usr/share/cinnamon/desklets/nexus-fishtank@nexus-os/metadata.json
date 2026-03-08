@@ -1,0 +1,12 @@
+{
+  "uuid": "nexus-fishtank@nexus-os",
+  "name": "NexusOS Fish Tank",
+  "description": "Spatial dashboard showing agent decision trees and activity in real-time — the 'Fish Tank' view",
+  "version": "0.1.0",
+  "cinnamon-version": ["6.0"],
+  "max-instances": 1,
+  "prevent-decorations": true,
+  "height": 400,
+  "width": 600,
+  "category": "System"
+}

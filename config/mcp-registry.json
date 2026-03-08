@@ -1,0 +1,63 @@
+{
+  "$schema": "https://nexus-os.dev/schemas/mcp-registry.json",
+  "version": "1.0.0",
+  "description": "NexusOS MCP Server Registry",
+  "servers": {
+    "filesystem": {
+      "name": "Filesystem Operations",
+      "command": "nexus-mcp-filesystem",
+      "args": ["--sandbox", "strict"],
+      "description": "Sandboxed file read/write/search operations",
+      "required_privilege": 2,
+      "auto_start": true
+    },
+    "process": {
+      "name": "Process Management",
+      "command": "nexus-mcp-process",
+      "args": [],
+      "description": "Process lifecycle management (start, stop, monitor)",
+      "required_privilege": 3,
+      "auto_start": true
+    },
+    "network": {
+      "name": "Network Operations",
+      "command": "nexus-mcp-network",
+      "args": ["--allow-external", "false"],
+      "description": "HTTP requests, DNS, service discovery",
+      "required_privilege": 2,
+      "auto_start": false
+    },
+    "identity": {
+      "name": "Directory Queries",
+      "command": "nexus-mcp-identity",
+      "args": [],
+      "description": "Query and manage users/agents in Nexus Directory",
+      "required_privilege": 2,
+      "auto_start": true
+    },
+    "credits": {
+      "name": "Credit Management",
+      "command": "nexus-mcp-credits",
+      "args": [],
+      "description": "Query credit balances, usage history, budget limits",
+      "required_privilege": 1,
+      "auto_start": true
+    },
+    "database": {
+      "name": "Database Operations",
+      "command": "nexus-mcp-database",
+      "args": ["--read-only", "true"],
+      "description": "SQL database query and management",
+      "required_privilege": 2,
+      "auto_start": false
+    },
+    "erp": {
+      "name": "ERP Integration",
+      "command": "nexus-mcp-erp",
+      "args": [],
+      "description": "Enterprise Resource Planning system integration",
+      "required_privilege": 3,
+      "auto_start": false
+    }
+  }
+}

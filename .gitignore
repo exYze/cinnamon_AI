@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build artifacts
+*.iso
+*.squashfs
+work/
+out/
+
+# Runtime
+*.db
+*.sqlite
+*.log
+*.pid
+
+# Secrets
+.env
+*.key
+*.pem
+*.crt
+
+# OS
+.DS_Store
+Thumbs.db

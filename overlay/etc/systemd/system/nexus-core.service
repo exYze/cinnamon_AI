@@ -1,0 +1,30 @@
+[Unit]
+Description=NexusOS Core — Autonomous Agentic AI Orchestration Daemon
+Documentation=https://nexus-os.dev/docs
+After=network-online.target nexus-directory.service
+Wants=network-online.target
+Requires=nexus-directory.service
+
+[Service]
+Type=simple
+User=nexus
+Group=nexus
+ExecStart=/opt/nexus/venv/bin/nexus-core --config /etc/nexus/nexus.conf
+Restart=on-failure
+RestartSec=5
+RuntimeDirectory=nexus
+StateDirectory=nexus
+LogsDirectory=nexus
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=nexus-core
+
+# Security hardening
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/nexus /var/log/nexus /run/nexus
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target
