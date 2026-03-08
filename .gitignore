@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*.pyc
 *.egg-info/
 dist/
 build/
@@ -15,7 +16,7 @@ venv/
 *.swp
 *.swo
 
-# Build artifacts
+# NexusOS build artifacts
 *.iso
 *.squashfs
 work/
@@ -36,3 +37,18 @@ out/
 # OS
 .DS_Store
 Thumbs.db
+
+# Cinnamon build artifacts
+data/theme/cinnamon.css
+debian/*.debhelper
+debian/*.log
+debian/*.substvars
+debian/.debhelper/
+debian/cinnamon-common/
+debian/cinnamon-dbg/
+debian/cinnamon-doc/
+debian/cinnamon/
+debian/debhelper-build-stamp
+debian/files
+debian/tmp/
+obj-x86_64-linux-gnu
