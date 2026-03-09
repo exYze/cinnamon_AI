@@ -21,5 +21,8 @@ setup(
         "console_scripts": [
             "nexus-core=nexus_core.orchestrator:main",
         ],
+        "gui_scripts": [
+            "nexus-control-center=nexus_core.control_center:main",
+        ],
     },
 )

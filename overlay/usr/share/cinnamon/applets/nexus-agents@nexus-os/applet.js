@@ -74,15 +74,16 @@ class NexusAgentApplet extends Applet.TextIconApplet {
         let controlCenter = new PopupMenu.PopupMenuItem("Open Control Center");
         controlCenter.connect("activate", () => {
             GLib.spawn_command_line_async(
-                "/opt/nexus/venv/bin/python3 -m nexus_core.dashboard"
+                "/opt/nexus/venv/bin/python3 /opt/nexus/src/nexus-core/nexus_core/control_center.py"
             );
         });
         this.menu.addMenuItem(controlCenter);
 
         let spawnAgent = new PopupMenu.PopupMenuItem("Spawn New Agent...");
         spawnAgent.connect("activate", () => {
+            // Open the Control Center (which has a spawn dialog)
             GLib.spawn_command_line_async(
-                "/opt/nexus/venv/bin/nexus-core spawn --interactive"
+                "/opt/nexus/venv/bin/python3 /opt/nexus/src/nexus-core/nexus_core/control_center.py"
             );
         });
         this.menu.addMenuItem(spawnAgent);
@@ -162,9 +163,9 @@ class NexusAgentApplet extends Applet.TextIconApplet {
 
             let item = new PopupMenu.PopupMenuItem(label);
             item.connect("activate", () => {
-                // Open agent detail view
+                // Open Control Center to manage this agent
                 GLib.spawn_command_line_async(
-                    `/opt/nexus/venv/bin/nexus-core inspect ${agentId}`
+                    "/opt/nexus/venv/bin/python3 /opt/nexus/src/nexus-core/nexus_core/control_center.py"
                 );
             });
             this._agentSection.addMenuItem(item);

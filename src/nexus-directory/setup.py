@@ -12,6 +12,7 @@ setup(
         "pydantic>=2.0",
         "click>=8.1",
         "rich>=13.0",
+        "bcrypt>=4.0",
     ],
     entry_points={
         "console_scripts": [

@@ -10,6 +10,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from nexus_core.security import InputValidator, RateLimiter, ValidationError
+
 logger = logging.getLogger("nexus.mcp_bridge")
 
 
@@ -87,11 +89,22 @@ class MCPBridge:
     - Audit logging of all tool invocations
     """
 
-    def __init__(self, registry_path: str = "/etc/nexus/mcp-registry.json"):
+    def __init__(
+        self,
+        registry_path: str = "/etc/nexus/mcp-registry.json",
+        rate_limit_tokens: int = 30,
+        rate_limit_refill: float = 2.0,
+        strict_validation: bool = True,
+    ):
         self.registry_path = registry_path
         self.servers: dict[str, MCPServerConnection] = {}
         self.audit_log: list[ToolInvocation] = []
         self._invocation_counter = 0
+        self._rate_limiter = RateLimiter(
+            max_tokens=rate_limit_tokens,
+            refill_rate=rate_limit_refill,
+        )
+        self._validator = InputValidator(strict=strict_validation)
 
     async def initialize(self) -> None:
         """Load registry and connect to auto-start servers."""
@@ -128,7 +141,13 @@ class MCPBridge:
         arguments: dict[str, Any],
     ) -> dict[str, Any]:
         """
-        Invoke a tool on behalf of an agent, with authorization and audit logging.
+        Invoke a tool on behalf of an agent.
+
+        Enforces (in order):
+        1. Rate limiting — per-agent token bucket
+        2. Input validation — schema-based argument checks
+        3. Privilege authorization — server-level access control
+        4. Execution with audit logging
         """
         self._invocation_counter += 1
         invocation = ToolInvocation(
@@ -139,7 +158,39 @@ class MCPBridge:
             arguments=arguments,
         )
 
-        # Check server exists
+        # --- Rate limiting ---
+        if not self._rate_limiter.allow(agent_id):
+            invocation.authorized = False
+            invocation.result = {
+                "error": "Rate limit exceeded. Try again shortly.",
+                "rate_limit": self._rate_limiter.get_status(agent_id),
+            }
+            logger.warning(
+                "Agent %s: rate-limited on %s.%s", agent_id, server_name, tool,
+            )
+            self.audit_log.append(invocation)
+            return invocation.result
+
+        # --- Input validation ---
+        validation_errors = self._validator.validate(server_name, tool, arguments)
+        if validation_errors:
+            invocation.authorized = False
+            error_details = [
+                {"field": e.field, "reason": e.reason} for e in validation_errors
+            ]
+            invocation.result = {
+                "error": "Input validation failed",
+                "validation_errors": error_details,
+            }
+            logger.warning(
+                "Agent %s: input validation failed on %s.%s — %s",
+                agent_id, server_name, tool,
+                "; ".join(e.reason for e in validation_errors),
+            )
+            self.audit_log.append(invocation)
+            return invocation.result
+
+        # --- Check server exists ---
         server = self.servers.get(server_name)
         if not server:
             invocation.authorized = False
@@ -147,7 +198,7 @@ class MCPBridge:
             self.audit_log.append(invocation)
             return invocation.result
 
-        # Authorization check
+        # --- Privilege authorization ---
         if agent_privilege < server.required_privilege:
             invocation.authorized = False
             invocation.result = {
@@ -162,11 +213,11 @@ class MCPBridge:
             self.audit_log.append(invocation)
             return invocation.result
 
-        # Connect if needed
+        # --- Connect if needed ---
         if not server.is_connected:
             await server.connect()
 
-        # Invoke
+        # --- Execute ---
         start = asyncio.get_event_loop().time()
         try:
             result = await server.invoke(tool, arguments)
